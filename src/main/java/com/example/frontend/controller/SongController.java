@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
+
 
 @RestController
 @RequestMapping("/songs")
@@ -20,6 +23,10 @@ public class SongController {
     @Autowired
     private CatalogService catalogService;
 
+
+    @Value("${frontend.useStaticData}") // Default to 'false' if the property is not set
+    private boolean useStaticData;
+
     /**
      * @return random 25 popular songs tracks
      */
@@ -27,7 +34,11 @@ public class SongController {
     public List<Track> discover() {
         List<Track> popularSongs = catalogService.fetchPopularSongs();
 
-        Collections.shuffle(popularSongs);
+
+        if (useStaticData == false){
+            Collections.shuffle(popularSongs);
+        }
+
         return popularSongs.subList(0, Math.min(25, popularSongs.size()));
     }
 
